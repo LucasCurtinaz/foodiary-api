@@ -1,5 +1,5 @@
 import { InvalidRefreshToken } from '@application/errors/application/InvalidRefreshToken';
-import { ForgotPasswordCommand, GetTokensFromRefreshTokenCommand, InitiateAuthCommand, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { ConfirmForgotPasswordCommand, ForgotPasswordCommand, GetTokensFromRefreshTokenCommand, InitiateAuthCommand, SignUpCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { AppConfig } from '@shared/config/AppConfig';
 import { createHmac } from 'node:crypto';
@@ -104,6 +104,22 @@ export class AuthGateway {
     await cognitoClient.send(command);
   }
 
+  async confirmForgotPassword({
+    email,
+    confirmationCode,
+    password,
+  }: AuthGateway.ConfirmForgotPasswordParams): Promise<void> {
+    const command = new ConfirmForgotPasswordCommand({
+      ClientId: this.appConfig.auth.cognito.client.id,
+      ConfirmationCode: confirmationCode,
+      Password: password,
+      Username: email,
+      SecretHash: this.getSecretHash(email),
+    });
+
+    await cognitoClient.send(command);
+  }
+
   private getSecretHash(email: string): string {
     const { id, secret } = this.appConfig.auth.cognito.client;
 
@@ -145,5 +161,11 @@ export namespace AuthGateway {
 
   export type ForgotPasswordParams = {
     email: string;
+  }
+
+  export type ConfirmForgotPasswordParams = {
+    email: string;
+    confirmationCode: string;
+    password: string;
   }
 }
