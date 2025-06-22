@@ -1,4 +1,5 @@
 import { Controller } from '@application/contracts/Controller';
+import { BadRequest } from '@application/errors/http/BadRequest';
 import { ConfirmPasswordUseCase } from '@application/usecases/auth/ConfirmPasswordUseCase';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { Schema } from '@kernel/decorators/Schema';
@@ -14,17 +15,21 @@ export class ConfirmForgotPasswordController extends Controller<'public', Confir
   protected override async handle(
     { body }: Controller.Request<'public', ConfirmForgotPasswordBody>,
   ): Promise<Controller.Response<ConfirmForgotPasswordController.Response>> {
-    const { email, confirmationCode, password } = body;
+    try {
+      const { email, confirmationCode, password } = body;
 
-    await this.confirmPasswordUseCase.execute({
-      email,
-      confirmationCode,
-      password,
-    });
+      await this.confirmPasswordUseCase.execute({
+        email,
+        confirmationCode,
+        password,
+      });
 
-    return {
-      statusCode: 204,
-    };
+      return {
+        statusCode: 204,
+      };
+    } catch {
+      throw new BadRequest('Failed. Try again.');
+    }
   }
 }
 
