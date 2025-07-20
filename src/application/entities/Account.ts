@@ -23,5 +23,5 @@ export namespace Account {
     externalId?: string;
     id?: string;
     createdAt?: Date;
-  }
+  };
 }
