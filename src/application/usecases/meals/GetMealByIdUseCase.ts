@@ -6,10 +6,10 @@ import { Injectable } from '@kernel/decorators/Injectable';
 
 @Injectable()
 export class GetMealByIdUseCase {
-constructor(
-  private readonly mealRepository: MealRepository,
-  private readonly mealsFileStorageGateway: MealsFileStorageGateway,
-) {}
+  constructor(
+    private readonly mealRepository: MealRepository,
+    private readonly mealsFileStorageGateway: MealsFileStorageGateway,
+  ) {}
 
   async execute({
     accountId,
@@ -20,7 +20,7 @@ constructor(
     if (!meal) {
       throw new ResourceNotFound('Meal not found.');
     }
-    
+
     const inputFileURL = this.mealsFileStorageGateway.getFileURL(meal.inputFileKey);
 
     return {

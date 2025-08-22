@@ -14,7 +14,7 @@ interface IPresignDecoded {
   fields: Record<string, string>;
 }
 
-async function readImageFile(filePath: string): Promise<{
+async function readFile(filePath: string, type: 'audio/m4a' | 'image/jpeg'): Promise<{
   data: Buffer;
   size: number;
   type: string;
@@ -24,7 +24,7 @@ async function readImageFile(filePath: string): Promise<{
   return {
     data,
     size: data.length,
-    type: 'image/jpeg',
+    type,
   };
 }
 
@@ -86,18 +86,19 @@ async function uploadToS3(url: string, form: FormData): Promise<void> {
   console.log('🎉 Upload completed successfully');
 }
 
-async function uploadMealImage(filePath: string): Promise<void> {
+async function uploadFile(filePath: string, fileType: 'audio/m4a' | 'image/jpeg'): Promise<void> {
   try {
-    const { data, size, type } = await readImageFile(filePath);
+    const { data, size, type } = await readFile(filePath, fileType);
     const { url, fields } = await createMeal(type, size);
     const form = buildFormData(fields, data, path.basename(filePath), type);
     await uploadToS3(url, form);
   } catch (err) {
-    console.error('❌ Error during uploadMealImage:', err);
+    console.error('❌ Error during uploadFile:', err);
     throw err;
   }
 }
 
-uploadMealImage(
-  path.resolve(__dirname, 'assets', 'cover.jpg'),
+uploadFile(
+  path.resolve(__dirname, 'assets', 'refeicao.jpg'),
+  'image/jpeg',
 ).catch(() => process.exit(1));
